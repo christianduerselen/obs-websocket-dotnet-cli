@@ -1,0 +1,75 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <!-- Sign assemblies with accompanying key -->
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)Key.snk</AssemblyOriginatorKeyFile>
+    <SignAssemblyPublicKey>00240000048000009400000006020000002400005253413100040000010001003d86bf110407693d21a960aa97f770cc88f3d98392a46afe4b1c5561a47de5a6fd87f5eaa7b643c33e57efb36bc2cf7c6b6dcf54c2e012d4d87748323958d5354dd06ac7df60ed11f8b8e1b51c1a22257a4401c6f59ec519504d87f9c7dd8e7a58c484f0a9de3a922c5df6908d49ec94340c4abf62a96464120f0d9ed8304ab9</SignAssemblyPublicKey>
+
+    <!-- Set C# language version 10.0 -->
+    <LangVersion>10.0</LangVersion>
+
+    <!-- Enable deterministic build -->
+    <Deterministic>true</Deterministic>
+
+    <!-- Place obj and bin directories for build in the root directory above src -->
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)bin\$(MSBuildProjectName)\</BaseOutputPath>
+
+    <!-- Set warning level to hightest value 5 and treat compile warnings as errors-->
+    <WarningLevel>5</WarningLevel>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+
+    <!-- Set fixed analysis level 5, enable all rules and treat warnings as errors -->
+    <AnalysisLevel>5</AnalysisLevel>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
+
+  </PropertyGroup>
+
+  <!-- PACKAGING AND DEBUG SYMBOL DISTRIBUTION -->
+  <PropertyGroup>
+    <!-- By default no projects are packable but can be overridden if needed -->
+    <IsPackable>false</IsPackable>
+
+    <!-- Debugging is done through additional debug symbols in the package for Azure DevOps - see https://github.com/dotnet/sourcelink#alternative-pdb-distribution -->
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <!-- Enable git versioning via accompanying version.json -->
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.6.133">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <!-- TESTS -->
+  <PropertyGroup>
+    <!-- Test projects are named "[Project under test].Tests" and automatically reference necessary dependencies -->
+    <IsTestProject>$(MSBuildProjectName.EndsWith('.Tests'))</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup Condition="!$(IsTestProject)">
+    <!-- Enable access to internal variables to accompanying test projects with implicit InternalsVisibleTo attribute -->
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>$(AssemblyName).Tests, PublicKey=$(SignAssemblyPublicKey)</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+  <ItemGroup Condition="$(IsTestProject)">
+    <!-- Test projects automatically reference necessary dependencies -->
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
+    <PackageReference Include="xunit" Version="2.4.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" />
+    <PackageReference Include="coverlet.collector" Version="6.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

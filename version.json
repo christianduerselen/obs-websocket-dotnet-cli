@@ -1,0 +1,19 @@
+{
+  // The $schema field is optional but highly encouraged as it causes most JSON editors to add auto-completion and doc tips to help you author the file
+  "$schema": "https://raw.githubusercontent.com/dotnet/Nerdbank.GitVersioning/master/src/NerdBank.GitVersioning/version.schema.json", 
+  
+  "version": "1.0", 
+  
+  // Make the NugetPackageVersion Semantic Versioning 2 compatible
+  "nuGetPackageVersion": {
+    "semVer": 2.0 
+  },
+  
+  // Builds from the following git references won't contain the commit suffix in the NugetPackageVersion
+  "publicReleaseRefSpec": [ 
+    // Branch 'release/v[Major].[Minor].[Patch]' (e.g. branch 'release/v1.13.4')
+	"^refs/heads/release/.+/v\\d+\\.\\d+\\.\\d+$",
+    // Tags 'v[Major].[Minor].[Patch](-*)' (e.g. tag 'v1.13.4' as well as 'v2.13.4-rc1')
+	"^refs/tags/.+/v\\d+\\.\\d+\\.\\d+(-.+)?$"
+  ]
+}
